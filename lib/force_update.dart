@@ -174,15 +174,16 @@ class CheckVersion {
 }
 
 class OpenAppstore {
-  static const MethodChannel _channel =
-      const MethodChannel('flutter.moum.open_appstore');
+  static MethodChannel _channel = MethodChannel('flutter.moum.open_appstore');
 
   static Future<String> get platformVersion async {
+    _channel = MethodChannel('flutter.moum.open_appstore');
     final String version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
 
   static void launch(String androidApplicationId, String iOSAppId) async {
+    _channel = MethodChannel('flutter.moum.open_appstore');
     await _channel.invokeMethod('openappstore', {
       'android_id': androidApplicationId, // eexamplex : com.company.davane,
       'ios_id': iOSAppId //example :id1234567890
