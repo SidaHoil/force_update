@@ -2,7 +2,7 @@ library forceupdate;
 
 import 'package:forceupdate/app_Info.dart';
 import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' show parse;
+import 'package:html/parser.dart' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
@@ -47,22 +47,21 @@ class CheckVersion {
     }
     List storeVersion = versionStatus.storeVersion.split(".");
     List currentVersion = versionStatus.localVersion.split(".");
-    if(storeVersion.length < currentVersion.length){
+    if (storeVersion.length < currentVersion.length) {
       int missValues = currentVersion.length - storeVersion.length;
-      for(int i = 0 ; i<missValues; i++){
+      for (int i = 0; i < missValues; i++) {
         storeVersion[storeVersion.length] = 0;
       }
-    }
-    else if(storeVersion.length > currentVersion.length){
+    } else if (storeVersion.length > currentVersion.length) {
       int missValues = storeVersion.length - currentVersion.length;
-      for(int i = 0 ; i<missValues; i++){
+      for (int i = 0; i < missValues; i++) {
         currentVersion[currentVersion.length] = 0;
       }
     }
 
     if (checkInBigger) {
-      for(int i = 0;i<storeVersion.length;i++){
-        if(storeVersion[i] > currentVersion[i]){
+      for (int i = 0; i < storeVersion.length; i++) {
+        if (storeVersion[i] > currentVersion[i]) {
           versionStatus.canUpdate = true;
           return versionStatus;
         }
@@ -73,15 +72,19 @@ class CheckVersion {
     return versionStatus;
   }
 
-  alertIfAvailable() async {
+  alertIfAvailable(String androidApplicationId, String iOSAppId) async {
     AppVersionStatus versionStatus = await getVersionStatus();
     if (versionStatus != null && versionStatus.canUpdate) {
-      showUpdateDialog(versionStatus: versionStatus);
+      showUpdateDialog(androidApplicationId, iOSAppId,
+          versionStatus: versionStatus);
     }
   }
-  getiOSAtStoreVersion(String appId /**app id in apple store not app bundle id*/,
+
+  getiOSAtStoreVersion(
+      String appId /**app id in apple store not app bundle id*/,
       AppVersionStatus versionStatus) async {
-    final response = await http.get('http://itunes.apple.com/lookup?bundleId=$appId');
+    final response =
+        await http.get('http://itunes.apple.com/lookup?bundleId=$appId');
     if (response.statusCode != 200) {
       print('The app with id: $appId is not found in app store');
       return null;
@@ -94,12 +97,14 @@ class CheckVersion {
   getAndroidAtStoreVersion(
       String applicationId /**application id, generally stay in build.gradle*/,
       AppVersionStatus versionStatus) async {
-    final response = await http.get('https://play.google.com/store/apps/details?id=$applicationId');
+    final response = await http
+        .get('https://play.google.com/store/apps/details?id=$applicationId');
     if (response.statusCode != 200) {
-      print('The app with application id: $applicationId is not found in play store');
+      print(
+          'The app with application id: $applicationId is not found in play store');
       return null;
     }
-    final document = parse(response.body);
+    final document = html.parse(response.body);
     final elements = document.getElementsByClassName('hAyfc');
     final versionElement = elements.firstWhere(
       (elm) => elm.querySelector('.BgcNfc').text == 'Current Version',
@@ -108,7 +113,9 @@ class CheckVersion {
     return versionStatus;
   }
 
-  void showUpdateDialog({
+  void showUpdateDialog(
+    String androidApplicationId,
+    String iOSAppId, {
     AppVersionStatus versionStatus,
     String message = "You can now update this app from store.",
     String titleText = 'Update Available',
@@ -121,7 +128,7 @@ class CheckVersion {
     final dismissAction = () => Navigator.pop(context);
     Text update = Text(updateText);
     final updateAction = () {
-      _launchAppStore();
+      _launchAppStore(androidApplicationId, iOSAppId);
       Navigator.pop(context);
     };
     final platform = Theme.of(context).platform;
@@ -161,8 +168,8 @@ class CheckVersion {
     );
   }
 
-  void _launchAppStore() async {
-    OpenAppstore.launch();
+  void _launchAppStore(String androidApplicationId, String iOSAppId) async {
+    OpenAppstore.launch(androidApplicationId, iOSAppId);
   }
 }
 
@@ -175,10 +182,10 @@ class OpenAppstore {
     return version;
   }
 
-  static void launch() async {
+  static void launch(String androidApplicationId, String iOSAppId) async {
     await _channel.invokeMethod('openappstore', {
-      'android_id': "com.bronx.membership.davane",
-      'ios_id': "id1517061508"
+      'android_id': androidApplicationId, // eexamplex : com.company.davane,
+      'ios_id': iOSAppId //example :id1234567890
     });
   }
 }
