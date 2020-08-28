@@ -11,7 +11,7 @@ See more at the [Dart Packages page.](https://pub.dartlang.org/packages/new_vers
 ## Installation
 Add force_update as a dependency in your pubspec.yaml file.
 ```dependencies:
-      forceupdate: ^0.0.3
+      forceupdate: ^0.0.5
 ```
 
 ## Usage
