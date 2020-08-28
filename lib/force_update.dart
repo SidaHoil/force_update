@@ -13,6 +13,7 @@ class AppVersionStatus {
   bool canUpdate;
   String localVersion;
   String storeVersion;
+  String appStoreUrl;
   AppVersionStatus({this.canUpdate, this.localVersion, this.storeVersion});
 }
 
@@ -24,8 +25,7 @@ class CheckVersion {
   CheckVersion({this.androidId, this.iOSId, @required this.context})
       : assert(context != null);
 
-  Future<AppVersionStatus> getVersionStatus(
-      {bool checkInNotEqual = true, bool checkInBigger = false}) async {
+  Future<AppVersionStatus> getVersionStatus({bool checkInBigger = true}) async {
     AppInfo packageInfo = await AppInfo.info();
     AppVersionStatus versionStatus = AppVersionStatus(
       localVersion: packageInfo.version,
@@ -50,18 +50,18 @@ class CheckVersion {
     if (storeVersion.length < currentVersion.length) {
       int missValues = currentVersion.length - storeVersion.length;
       for (int i = 0; i < missValues; i++) {
-        storeVersion[storeVersion.length] = 0;
+        storeVersion.add(0);
       }
     } else if (storeVersion.length > currentVersion.length) {
       int missValues = storeVersion.length - currentVersion.length;
       for (int i = 0; i < missValues; i++) {
-        currentVersion[currentVersion.length] = 0;
+        currentVersion.add(0);
       }
     }
 
     if (checkInBigger) {
       for (int i = 0; i < storeVersion.length; i++) {
-        if (storeVersion[i] > currentVersion[i]) {
+        if (int.parse(storeVersion[i]) > int.parse(currentVersion[i])) {
           versionStatus.canUpdate = true;
           return versionStatus;
         }
@@ -91,14 +91,15 @@ class CheckVersion {
     }
     final jsonObj = jsonDecode(response.body);
     versionStatus.storeVersion = jsonObj['results'][0]['version'];
+    versionStatus.appStoreUrl = jsonObj['results'][0]['trackViewUrl'];
     return versionStatus;
   }
 
   getAndroidAtStoreVersion(
       String applicationId /**application id, generally stay in build.gradle*/,
       AppVersionStatus versionStatus) async {
-    final response = await http
-        .get('https://play.google.com/store/apps/details?id=$applicationId');
+    final url = 'https://play.google.com/store/apps/details?id=$applicationId';
+    final response = await http.get(url);
     if (response.statusCode != 200) {
       print(
           'The app with application id: $applicationId is not found in play store');
@@ -110,6 +111,7 @@ class CheckVersion {
       (elm) => elm.querySelector('.BgcNfc').text == 'Current Version',
     );
     versionStatus.storeVersion = versionElement.querySelector('.htlgb').text;
+    versionStatus.appStoreUrl = url;
     return versionStatus;
   }
 
@@ -135,30 +137,30 @@ class CheckVersion {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return platform == TargetPlatform.android
-            ? AlertDialog(
+        return platform == TargetPlatform.iOS
+            ? CupertinoAlertDialog(
                 title: title,
                 content: content,
                 actions: <Widget>[
-                  FlatButton(
+                  CupertinoDialogAction(
                     child: dismiss,
                     onPressed: dismissAction,
                   ),
-                  FlatButton(
+                  CupertinoDialogAction(
                     child: update,
                     onPressed: updateAction,
                   ),
                 ],
               )
-            : CupertinoAlertDialog(
+            : AlertDialog(
                 title: title,
                 content: content,
                 actions: <Widget>[
-                  CupertinoDialogAction(
+                  FlatButton(
                     child: dismiss,
                     onPressed: dismissAction,
                   ),
-                  CupertinoDialogAction(
+                  FlatButton(
                     child: update,
                     onPressed: updateAction,
                   ),
@@ -185,7 +187,8 @@ class OpenAppstore {
   static void launch(String androidApplicationId, String iOSAppId) async {
     _channel = MethodChannel('flutter.moum.open_appstore');
     await _channel.invokeMethod('openappstore', {
-      'android_id': androidApplicationId, // eexamplex : com.company.davane,
+      'android_id':
+          androidApplicationId, // eexamplex : com.company.projectName,
       'ios_id': iOSAppId //example :id1234567890
     });
   }
