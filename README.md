@@ -3,7 +3,9 @@
 This package is use for check new version available both ios and android. If it has a new version, you can link to app store or play store. But you need to know app id in store first.
 
 See more at the [Dart Packages page.](https://pub.dartlang.org/packages/new_version)
+
 ![Screenshots](screenshots/ios.jpeg)
+
 ![Screenshots](screenshots/android.jpeg)
 
 ## Installation
