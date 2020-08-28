@@ -59,16 +59,13 @@ class CheckVersion {
       }
     }
 
-    if (checkInBigger) {
-      for (int i = 0; i < storeVersion.length; i++) {
-        if (int.parse(storeVersion[i]) > int.parse(currentVersion[i])) {
-          versionStatus.canUpdate = true;
-          return versionStatus;
-        }
+    for (int i = 0; i < storeVersion.length; i++) {
+      if (int.parse(storeVersion[i]) > int.parse(currentVersion[i])) {
+        versionStatus.canUpdate = true;
+        return versionStatus;
       }
     }
-    versionStatus.canUpdate =
-        versionStatus.storeVersion != versionStatus.localVersion;
+    versionStatus.canUpdate = false;
     return versionStatus;
   }
 
