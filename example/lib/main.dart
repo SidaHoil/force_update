@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:forceupdate/force_update.dart';
+import 'package:forceupdate/forceupdate.dart';
 
 void main() {
   runApp(MyApp());
