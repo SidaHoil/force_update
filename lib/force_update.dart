@@ -1,6 +1,5 @@
 library forceupdate;
 
-import 'package:forceupdate/app_Info.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as html;
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 
 class AppVersionStatus {
   bool canUpdate;
@@ -26,7 +26,7 @@ class CheckVersion {
       : assert(context != null);
 
   Future<AppVersionStatus> getVersionStatus({bool checkInBigger = true}) async {
-    AppInfo packageInfo = await AppInfo.info();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
     AppVersionStatus versionStatus = AppVersionStatus(
       localVersion: packageInfo.version,
     );
