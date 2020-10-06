@@ -1,6 +1,6 @@
 name: forceupdate
 description: This package is use for check new version available both ios and android. If it has a new version, you can link to app store or play store.
-version: 0.0.5
+version: 0.0.6
 homepage: https://github.com/SidaHoil/force_update
 
 environment:

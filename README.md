@@ -4,7 +4,7 @@ This package is use for check new version available both ios and android. If it 
 
 See more at the [Dart Packages page.](https://pub.dartlang.org/packages/new_version)
 
-![Screenshots](screenshots/both.png)!
+![Screenshots](screenshots/ios.png)!
 
 ## Installation
 Add force_update as a dependency in your pubspec.yaml file.
